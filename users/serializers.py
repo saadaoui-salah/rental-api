@@ -80,6 +80,7 @@ class UserSerializer(serializers.ModelSerializer):
             bio=validated_data['bio']
             brokerage_name=validated_data['brokerageName']
             state=validated_data['state'],
+            image=validated_data['image'],
             user_type=validated_data['userType']
         )
         return user
