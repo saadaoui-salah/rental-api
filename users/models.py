@@ -21,12 +21,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         (REAL_ESTATE_AGENT, 'Real Estate Agent'),
     ]
 
+    INTERNAL_SEARCH = "INTERNAL_SEARCH"
+    EMAIL_TEXT = "EMAIL/TEXT"
+    RADIO = "RADIO"
+    TV = "TV"
+    OTHER = "OTHER"
+
     COMING_FROM_CHOICES = [
-        ("INTERNAL_SEARCH", 'Internal Search'),
-        ("EMAIL/TEXT", 'Email/Text'),
-        ("RADIO", 'Radio'),
-        ("TV", 'TV'),
-        ("OTHER", 'Other'),
+        (INTERNAL_SEARCH, 'Internal Search'),
+        (EMAIL_TEXT, 'Email/Text'),
+        (RADIO, 'Radio'),
+        (TV, 'TV'),
+        (OTHER, 'Other'),
     ]
     
     email = models.EmailField(unique=True)
@@ -35,12 +41,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    phone_number = models.CharField(max_length=30)
     date_joined = models.DateTimeField(default=timezone.now)
-    image = models.ImageField(upload_to="/media/users")
+    phone_number = models.CharField(max_length=30)
+    image = models.ImageField(upload_to="media/users", null=True, blank=True)
     coming_from_choice = models.CharField(max_length=30, choices=COMING_FROM_CHOICES)
     coming_from = models.CharField(max_length=200)
-    qualified_with_lender = models.BooleanField(default=False)
+    qualified_with_lender = models.BooleanField(null=True, blank=True)
     lenders_name = models.CharField(max_length=300)
     lenders_contact = models.CharField(max_length=300)
     company = models.CharField(max_length=200)
