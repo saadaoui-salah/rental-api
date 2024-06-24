@@ -1,62 +1,94 @@
-from django.contrib.auth.models import get_user_model
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import CustomUser
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if email and password:
+            user = User.objects.filter(email=email).get()
+            if not user:
+                raise serializers.ValidationError("Invalid credentials")
+            user.check_password(password)
+        else:
+            raise serializers.ValidationError("Both fields are required")
+
+        data['user'] = user
+        return data
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    def validate(self, data):
+        self.token = data['refresh']
+        return data
+
+    def save(self, **kwargs):
+        RefreshToken(self.token).blacklist()
+
+class UserSignupSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
+        fields = '__all__'
 
     def validate(self, data):
 
-        if data['userType'] == CustomUser.BUYER :
-            if data['qualifiedWithLender'] == None \
-            or data['qualifiedWithLender'] == "" \
+        if data['user_type'] == CustomUser.BUYER :
+            if data['qualified_with_lender'] == None \
+            or data['qualified_with_lender'] == "" \
             or data['company'] \
-            or data['licenseNumber'] \
+            or data['license_number'] \
             or data['bio'] \
-            or data['brokerageName'] \
+            or data['brokerage_name'] \
             or data['state'] :
-                if data['qualifiedWithLender'] \
-                and not validated_data['lendersContact'] \
-                and not validated_data['lendersName']:
+                if data['qualified_with_lender'] \
+                and not validated_data['lenders_contact'] \
+                and not validated_data['lenders_name']:
                     return data
                 else:
                     raise serializers.ValidationError("Not Valid Data.")
 
-        if data['userType'] == CustomUser.SELLER:
-            if data['qualifiedWithLender'] \
-            or data['lendersName'] \
-            or data['lendersContact'] \
+        if data['user_type'] == CustomUser.SELLER:
+            if data['qualified_with_lender'] \
+            or data['lenders_name'] \
+            or data['lenders_contact'] \
             or data['company'] \
-            or data['licenseNumber'] \
+            or data['license_number'] \
             or data['bio'] \
-            or data['brokerageName'] \
+            or data['brokerage_name'] \
             or data['state'] :
                 raise serializers.ValidationError("Not Valid Data.")
 
-        elif data['userType'] == CustomUser.LOAN_OFFICER:
-            if data['qualifiedWithLender'] \
-            or data['lendersName'] \
-            or data['lendersContact'] \
-            or data['brokerageName'] \
+        elif data['user_type'] == CustomUser.LOAN_OFFICER:
+            if data['qualified_with_lender'] \
+            or data['lenders_name'] \
+            or data['lenders_contact'] \
+            or data['brokerage_name'] \
             or not data['company'] \
-            or not data['licenseNumber'] \
+            or not data['license_number'] \
             or not data['bio'] \
             or data['state'] :
                 raise serializers.ValidationError("Not Valid Data.")
         
-        elif data['userType'] == CustomUser.REAL_ESTATE_AGENT:
-            if data['qualifiedWithLender'] \
-            or data['lendersName'] \
-            or data['lendersContact'] \
+        elif data['user_type'] == CustomUser.REAL_ESTATE_AGENT:
+            if data['qualified_with_lender'] \
+            or data['lenders_name'] \
+            or data['lenders_contact'] \
             or data['company'] \
-            or not data['brokerageName'] \
-            or not data['licenseNumber'] \
+            or not data['brokerage_name'] \
+            or not data['license_number'] \
             or not data['bio'] \
             or not data['state'] :
                 raise serializers.ValidationError("Not Valid Data.")
@@ -64,23 +96,22 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
+        user = User.objects.create(
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
             email=validated_data['email'],
-            phone_number=validated_data['phoneNumber']
-            image=validated_data['image']
-            coming_from_choice=validated_data['comingFromChoice']
-            coming_from=validated_data['coming_from']
-            qualified_with_lender=validated_data['qualifiedWithLender']
-            lenders_name=validated_data['lendersName']
-            lenders_contact=validated_data['lendersContact']
-            company=validated_data['company']
-            license_number=validated_data['licenseNumber']
-            bio=validated_data['bio']
-            brokerage_name=validated_data['brokerageName']
+            phone_number=validated_data['phone_number'],
+            coming_from_choice=validated_data['coming_from_choice'],
+            coming_from=validated_data['coming_from'],
+            qualified_with_lender=validated_data['qualified_with_lender'],
+            lenders_name=validated_data['lenders_name'],
+            lenders_contact=validated_data['lenders_contact'],
+            company=validated_data['company'],
+            license_number=validated_data['license_number'],
+            bio=validated_data['bio'],
+            brokerage_name=validated_data['brokerage_name'],
             state=validated_data['state'],
-            image=validated_data['image'],
-            user_type=validated_data['userType']
+            user_type=validated_data['user_type']
         )
+        user.set_password(validated_data['password'])
         return user
