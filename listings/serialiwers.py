@@ -52,3 +52,30 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = '__all__'
+
+    def create(self, validated_data):
+        answers_data = validated_data.pop('answers')
+        property_instance = Property.objects.create(**validated_data)
+        for answer_data in answers_data:
+            question_id = answer_data.pop('question')
+            question_instance = Question.objects.get(id=question_id)
+            Answer.objects.create(question=question_instance, **answer_data)
+        return property_instance
+
+    def update(self, instance, validated_data):
+        answers_data = validated_data.pop('answers')
+        instance.price = validated_data.get('price', instance.price)
+        instance.status = validated_data.get('status', instance.status)
+        instance.address = validated_data.get('address', instance.address)
+        instance.unit_number = validated_data.get('unit_number', instance.unit_number)
+        instance.video = validated_data.get('video', instance.video)
+        instance.save()
+
+        for answer_data in answers_data:
+            question_id = answer_data.pop('question')
+            question_instance = Question.objects.get(id=question_id)
+            answer_instance, created = Answer.objects.get_or_create(question=question_instance, user=answer_data['user'])
+            answer_instance.answer = answer_data.get('answer', answer_instance.answer)
+            answer_instance.save()
+
+        return instance
