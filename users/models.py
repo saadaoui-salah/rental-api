@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-
+from django.contrib.auth import get_user_model
 
 
 class State(models.Model):
@@ -62,6 +62,26 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+class SavedSearch(models.Model):
+
+    INSTANT = "INSTANT"
+    DAILY = "DAILY"
+    WEEKLY = "WEEKLY"
+    MONTHLY = "MONTHLY"
+    NEVER = "NEVER"
+
+    notification_type = [
+        (INSTANT, "INSTANT"),
+        (DAILY, "DAILY"),
+        (WEEKLY, "WEEKLY"),
+        (MONTHLY, "MONTHLY"),
+        (NEVER, "NEVER")
+    ]
+
+    name = models.CharField(max_length=200)
+    notification_type = models.CharField(max_length=200)
+    address = models.CharField(max_length=1000)
 
 class Favorites(models.Model):
-    pass
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    lsiting = models.ManyToManyField("listings.Property")
