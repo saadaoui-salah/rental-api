@@ -45,10 +45,12 @@ INSTALLED_APPS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
+    'https://rental-frontend-master.vercel.app'
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://rental-frontend-master.vercel.app'
 ]
 
 MIDDLEWARE = [
