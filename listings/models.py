@@ -4,6 +4,10 @@ from users.models import CustomUser
 User = get_user_model()
 
 
+class PropertyType(models.Model):
+    name = models.CharField(max_length=200)
+
+
 class Property(models.Model):
     PENDING = "PENDING"
     ACTIVE = "ACTIVE"
@@ -15,6 +19,7 @@ class Property(models.Model):
         (RENT, "Rent"),
         ]
 
+    property_type = models.ForeignKey(PropertyType, on_delete=models.CASCADE)
     user = models.ForeignKey(User,limit_choices_to={'user_type':CustomUser.SELLER}, on_delete=models.CASCADE)
     price = models.FloatField(max_length=100)
     status = models.CharField(max_length=100, choices=status_choices)

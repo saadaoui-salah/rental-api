@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class Offer(models.Model):
+class Showing(models.Model):
     IN_PERSON = "IN_PERSON"
     VIRTUAL = "VIRTUAL"
 

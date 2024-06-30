@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, State
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
+class StateSerializer(serializers.ModelSerializer):
+    model = State
+    fields = '__all__'
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
