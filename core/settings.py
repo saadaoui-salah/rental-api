@@ -137,7 +137,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+CORS_ALLOW_CREDENTIALS = True
 
+# Optional: Specify allowed headers if needed
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-requested-with',
+    'accept',
+    'origin',
+    'x-csrftoken',
+    'x-frame-options',
+]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -148,3 +159,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_ROOT = 'admin'
+
+STATIC_URL = "static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    "/var/www/static/",
+]
